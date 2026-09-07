@@ -122,8 +122,8 @@ async function start() {
   }, 15 * 60 * 1000);
 
   await new Promise((resolve, reject) => {
-    httpServer.listen(env.port, () => {
-      logger.info(`Server running on port ${env.port}`);
+    httpServer.listen(env.port, '0.0.0.0', () => {
+      logger.info(`Server running on 0.0.0.0:${env.port}`);
       resolve();
     });
     httpServer.once('error', reject);

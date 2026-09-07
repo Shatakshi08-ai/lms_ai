@@ -1,42 +1,84 @@
 services:
   mongo:
     image: mongo:7
+    container_name: questlearn-mongo
     restart: unless-stopped
     volumes:
       - lms_mongo:/data/db
-    ports:
-      - "27017:27017"
+    networks:
+      - questlearn
+    # Do not publish MongoDB to the public internet.
+    expose:
+      - "27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
 
   server:
     build:
       context: .
       dockerfile: server/Dockerfile
+    container_name: questlearn-server
     restart: unless-stopped
     env_file:
-      - ./server/.env.example
+      - .env
     environment:
       PORT: 5000
       NODE_ENV: production
-      MONGODB_URI: mongodb://mongo:27017/lms_ai
-      CLIENT_ORIGIN: http://localhost:8080,http://localhost:5173
-      COOKIE_SECURE: "false"
+      MONGODB_URI: mongodb://mongo:27017/${MONGO_DB_NAME:-LMSAI}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:8080}
+      CLIENT_URL: ${CLIENT_URL:-${CLIENT_ORIGIN:-http://localhost:8080}}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-${JWT_ACCESS_SECRET}}
+      JWT_ACCESS_EXPIRES: ${JWT_ACCESS_EXPIRES:-15m}
+      JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES:-7d}
+      UPLOAD_DIR: uploads
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
-      AI_PROVIDER: ${AI_PROVIDER:-mock}
-    ports:
-      - "5000:5000"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-EXAVITQu4vr4xnSDxMaL}
+      CURRENCY: ${CURRENCY:-INR}
+      CURRENCY_SYMBOL: ${CURRENCY_SYMBOL:-₹}
+    volumes:
+      - lms_uploads:/app/server/uploads
+      - lms_private_pdfs:/app/server/private-pdfs
+    networks:
+      - questlearn
+    # API is reached through Nginx (client). Keep backend internal.
+    expose:
+      - "5000"
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
 
   client:
     build:
       context: .
       dockerfile: client/Dockerfile
+    container_name: questlearn-client
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "${HTTP_PORT:-8080}:80"
+    networks:
+      - questlearn
     depends_on:
-      - server
+      server:
+        condition: service_healthy
+
+networks:
+  questlearn:
+    driver: bridge
 
 volumes:
   lms_mongo:
+  lms_uploads:
+  lms_private_pdfs:

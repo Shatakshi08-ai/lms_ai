@@ -5,6 +5,7 @@ build
 coverage
 .env
 .env.local
+.env.production
 uploads
 *.log
 logs
