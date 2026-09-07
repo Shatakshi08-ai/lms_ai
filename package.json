@@ -1,0 +1,20 @@
+{
+  "name": "lms-ai-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered Library Management System (MERN)",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "seed": "npm run seed --prefix server",
+    "seed:ensure": "npm run seed:ensure --prefix server",
+    "seed:catalog": "npm run seed:catalog --prefix server",
+    "test": "npm run test --prefix server && npm run test --prefix client",
+    "install:all": "npm install --prefix server && npm install --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "html5-qrcode": "^2.3.8"
+  }
+}

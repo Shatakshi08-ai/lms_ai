@@ -1,0 +1,816 @@
+.ql-landing {
+  --ql-navy: #0c1d33;
+  --ql-navy-2: #17375c;
+  --ql-cream: #f3eee4;
+  --ql-gold: #c9a15a;
+  --ql-ink: #1c2430;
+  --ql-muted: #5c6570;
+  background: var(--ql-cream);
+  color: var(--ql-ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.ql-landing h1,
+.ql-landing h2,
+.ql-landing h3,
+.ql-cta h2,
+.ql-rev-content h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.ql-container {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.ql-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ql-nav-overlay {
+  background: transparent;
+  color: #fff;
+}
+
+.ql-nav-solid {
+  background: rgba(15, 39, 68, 0.96);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(15, 39, 68, 0.25);
+}
+
+.ql-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: min(1180px, calc(100% - 24px));
+  margin: 0 auto;
+  min-height: 72px;
+}
+
+.ql-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.ql-brand-mark {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  color: var(--ql-gold);
+}
+
+.ql-brand strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.ql-brand em {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.ql-nav-links {
+  display: none;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.ql-nav-links a {
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.92rem;
+  position: relative;
+}
+
+.ql-nav-links a.is-active::after,
+.ql-nav-links a:hover::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: var(--ql-gold);
+}
+
+.ql-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.ql-icon-btn,
+.ql-burger {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.ql-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 8px 16px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.ql-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ql-btn:focus-visible,
+.ql-nav-links a:focus-visible,
+.ql-icon-btn:focus-visible,
+.ql-burger:focus-visible {
+  outline: 2px solid var(--ql-gold);
+  outline-offset: 3px;
+}
+
+.ql-btn-gold {
+  background: var(--ql-gold);
+  color: var(--ql-navy);
+}
+
+.ql-btn-navy,
+.ql-btn-ghost {
+  background: transparent;
+  color: inherit;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.ql-btn-navy {
+  background: var(--ql-navy);
+  color: #fff;
+  border: 0;
+}
+
+.ql-btn-light {
+  background: #fff;
+  color: var(--ql-navy);
+}
+
+.ql-btn-ghost-light {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: transparent;
+}
+
+.ql-btn-lg {
+  padding: 12px 22px;
+}
+
+.ql-hero {
+  margin-top: -72px;
+}
+
+.ql-rev-stage {
+  position: relative;
+  min-height: min(92vh, 820px);
+  overflow: hidden;
+  background: var(--ql-navy);
+}
+
+.ql-rev-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.ql-rev-slide.is-active {
+  opacity: 1;
+  transform: translate3d(var(--ql-tilt-x, 0px), var(--ql-tilt-y, 0px), 0);
+}
+
+.ql-rev-ken {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.08);
+  animation: ql-ken 7s ease forwards;
+}
+
+.ql-rev-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, rgba(12, 29, 51, 0.92) 8%, rgba(12, 29, 51, 0.55) 55%, rgba(12, 29, 51, 0.42) 100%);
+}
+
+.ql-rev-layer {
+  animation: ql-rise 0.7s ease both;
+}
+
+.ql-hero-float {
+  position: absolute;
+  right: 6%;
+  top: 22%;
+  width: min(240px, 28vw);
+  z-index: 2;
+  pointer-events: none;
+  color: #f4efe6;
+  opacity: 0.7;
+}
+
+.ql-hero-mark {
+  margin-top: 18px;
+  width: 72px;
+  color: var(--ql-gold);
+}
+
+.ql-stats .ql-error {
+  grid-column: 1 / -1;
+}
+
+.ql-rev-content {
+  position: relative;
+  z-index: 2;
+  width: min(760px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 140px 0 80px;
+  color: #fff;
+}
+
+.ql-hero-logo {
+  width: 56px;
+  height: 56px;
+  color: var(--ql-gold);
+  margin-bottom: 12px;
+}
+
+.ql-kicker {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ql-gold);
+  font-size: 12px;
+}
+
+.ql-section .ql-kicker,
+.ql-elena-band .ql-kicker {
+  text-align: center;
+}
+
+.ql-rev-content h1 {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.15;
+  margin: 8px 0 12px;
+}
+
+.ql-lead,
+.ql-sub {
+  max-width: 52ch;
+  opacity: 0.92;
+}
+
+.ql-hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.ql-hero-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 10px 12px;
+  backdrop-filter: blur(10px);
+}
+
+.ql-hero-search input,
+.ql-hero-search select {
+  flex: 1 1 160px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  min-height: 40px;
+}
+
+.ql-hero-search input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ql-hero-search select option {
+  color: #111;
+}
+
+.ql-rev-dots {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.ql-rev-dots button {
+  width: 10px;
+  height: 10px;
+  border-radius: 99px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+}
+
+.ql-rev-dots button.is-active {
+  background: var(--ql-gold);
+  width: 26px;
+}
+
+.ql-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: min(1180px, calc(100% - 32px));
+  margin: -40px auto 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.ql-stat {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(15, 39, 68, 0.08);
+  text-align: center;
+}
+
+.ql-stat strong {
+  display: block;
+  font-size: 1.6rem;
+  color: var(--ql-navy);
+}
+
+.ql-section {
+  padding: 56px 0;
+}
+
+.ql-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.ql-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.ql-section h2,
+.ql-cta h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.ql-section h2 {
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--ql-gold);
+}
+
+.ql-section-lead {
+  text-align: center;
+  max-width: 62ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ql-section-lead,
+.ql-empty,
+.ql-error {
+  color: var(--ql-muted);
+  margin-bottom: 16px;
+}
+
+.ql-error button {
+  margin-left: 8px;
+}
+
+.ql-book-grid,
+.ql-cat-grid,
+.ql-feat-grid,
+.ql-rev-grid,
+.ql-skel-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.ql-book-grid,
+.ql-skel-grid {
+  grid-template-columns: 1fr;
+}
+
+.ql-cat-grid,
+.ql-feat-grid {
+  grid-template-columns: 1fr;
+}
+
+.ql-skel {
+  min-height: 180px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #e8e0d4, #f7f2ea, #e8e0d4);
+  background-size: 200% 100%;
+  animation: ql-shimmer 1.2s linear infinite;
+}
+
+.ql-cat-card,
+.ql-feat-card,
+.ql-mini-card,
+.ql-review-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 10px 24px rgba(15, 39, 68, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ql-cat-card:hover,
+.ql-feat-card:hover,
+.ql-mini-card:hover {
+  transform: translateY(-4px);
+}
+
+.ql-cat-card small {
+  display: block;
+  color: var(--ql-muted);
+}
+
+.ql-feat-svg {
+  width: 44px;
+  height: 44px;
+  color: var(--ql-navy);
+}
+
+.ql-step-icon {
+  width: 36px;
+  height: 28px;
+  color: var(--ql-navy);
+  margin-bottom: 8px;
+}
+
+.ql-center {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.ql-elena-band {
+  background: var(--ql-navy);
+  color: #fff;
+  padding: 64px 0;
+}
+
+.ql-elena-inner {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+}
+
+.ql-elena-photo {
+  width: min(280px, 70vw);
+  height: min(280px, 70vw);
+  object-fit: cover;
+  object-position: center 18%;
+  border-radius: 50%;
+  border: 4px solid var(--ql-gold);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+
+.ql-elena-mini {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  object-position: center 18%;
+  border-radius: 50%;
+}
+
+.ql-footer-elena {
+  display: block;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  opacity: 0.85;
+  cursor: pointer;
+  text-align: left;
+  margin: 4px 0;
+}
+
+.ql-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(12, 29, 51, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.ql-modal {
+  width: min(440px, 100%);
+  background: #fff;
+  color: var(--ql-ink);
+  border-radius: 18px;
+  padding: 28px 24px;
+  box-shadow: 0 24px 50px rgba(12, 29, 51, 0.25);
+  text-align: center;
+}
+
+.ql-modal h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  margin-bottom: 8px;
+}
+
+.ql-steps {
+  position: relative;
+  display: grid;
+  gap: 16px;
+}
+
+.ql-step span {
+  color: var(--ql-gold);
+  font-weight: 700;
+}
+
+.ql-mini-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.ql-mini-card strong,
+.ql-mini-card span,
+.ql-mini-card small {
+  display: block;
+}
+
+.ql-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 99px;
+  background: var(--ql-navy);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.ql-cta {
+  background: linear-gradient(135deg, var(--ql-navy), var(--ql-navy-2));
+  color: #fff;
+  padding: 64px 0;
+  text-align: center;
+}
+
+.ql-footer {
+  background: #0b1d33;
+  color: #efe8dc;
+  padding: 40px 0 16px;
+}
+
+.ql-footer-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.ql-footer a,
+.ql-footer p {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.85;
+  margin: 4px 0;
+}
+
+.ql-copy {
+  text-align: center;
+  opacity: 0.7;
+  margin-top: 24px;
+  font-size: 13px;
+}
+
+.ql-mobile-menu {
+  display: grid;
+  gap: 4px;
+  padding: 8px 20px 20px;
+  background: var(--ql-navy);
+}
+
+.ql-mobile-menu a,
+.ql-mobile-menu button {
+  color: #fff;
+  background: none;
+  border: 0;
+  text-align: left;
+  padding: 10px 0;
+  text-decoration: none;
+  animation: ql-rise 0.28s ease both;
+}
+
+.ql-public-shell {
+  min-height: 100vh;
+  background: var(--ql-cream, #f4efe6);
+}
+
+.ql-public-main {
+  width: min(1180px, calc(100% - 24px));
+  margin: 24px auto 48px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+@keyframes ql-ken {
+  to { transform: scale(1.16); }
+}
+
+@keyframes ql-shimmer {
+  to { background-position: -200% 0; }
+}
+
+@keyframes ql-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.ql-logo-animated .ql-logo-path {
+  stroke-dasharray: 40;
+  animation: ql-draw 2.8s ease infinite;
+}
+
+.ql-logo-animated .ql-logo-glow {
+  animation: ql-pulse 2.4s ease-in-out infinite;
+}
+
+.svgator-book-left,
+.svgator-book-right {
+  transform-origin: 40px 44px;
+  animation: ql-book-open 3.2s ease-in-out infinite;
+}
+
+.svgator-needle {
+  transform-origin: 32px 32px;
+  animation: ql-spin-slow 8s linear infinite;
+}
+
+.svgator-lens {
+  transform-origin: 20px 20px;
+  animation: ql-pulse 2.6s ease-in-out infinite;
+}
+
+.svgator-heart {
+  animation: ql-pulse 2.2s ease-in-out infinite;
+}
+
+.svgator-arc {
+  animation: ql-pulse 2.8s ease-in-out infinite;
+}
+
+.svgator-star {
+  transform-origin: 24px 24px;
+  animation: ql-spin-slow 10s linear infinite;
+}
+
+.svgator-float-a,
+.svgator-float-b,
+.svgator-float-c {
+  animation: ql-float 5s ease-in-out infinite;
+}
+
+.svgator-float-b { animation-delay: 0.6s; }
+.svgator-float-c { animation-delay: 1.2s; }
+
+@keyframes ql-book-open {
+  50% { transform: rotateY(10deg); }
+}
+
+@keyframes ql-spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ql-float {
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes ql-draw {
+  50% { stroke-dashoffset: 40; }
+}
+
+@keyframes ql-pulse {
+  50% { opacity: 0.45; }
+}
+
+@media (max-width: 767px) {
+  .ql-hero-float,
+  .ql-hero-mark {
+    display: none;
+  }
+  .ql-nav-actions .ql-btn {
+    display: none;
+  }
+  .ql-brand em {
+    display: none;
+  }
+  .ql-hero-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ql-hero-search button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .ql-nav-links { display: flex; }
+  .ql-burger { display: none; }
+  .ql-stats { grid-template-columns: repeat(4, 1fr); }
+  .ql-book-grid, .ql-skel-grid { grid-template-columns: repeat(2, 1fr); }
+  .ql-cat-grid, .ql-feat-grid, .ql-rev-grid { grid-template-columns: repeat(2, 1fr); }
+  .ql-footer-grid { grid-template-columns: 1.4fr repeat(4, 1fr); }
+  .ql-elena-inner { grid-template-columns: 1.4fr 0.8fr; }
+  .ql-steps { grid-template-columns: repeat(4, 1fr); }
+  .ql-steps-line {
+    position: absolute;
+    top: 18px;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ql-gold), transparent);
+  }
+}
+
+@media (min-width: 1100px) {
+  .ql-book-grid, .ql-skel-grid { grid-template-columns: repeat(4, 1fr); }
+  .ql-cat-grid { grid-template-columns: repeat(4, 1fr); }
+  .ql-feat-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ql-rev-ken,
+  .ql-logo-animated *,
+  .ql-skel,
+  .svgator-book-left,
+  .svgator-book-right,
+  .svgator-needle,
+  .svgator-lens,
+  .svgator-heart,
+  .svgator-arc,
+  .svgator-star,
+  .svgator-float-a,
+  .svgator-float-b,
+  .svgator-float-c,
+  .ql-rev-layer {
+    animation: none !important;
+  }
+  .ql-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .ql-btn:hover,
+  .ql-cat-card:hover,
+  .ql-feat-card:hover,
+  .ql-mini-card:hover {
+    transform: none;
+  }
+}

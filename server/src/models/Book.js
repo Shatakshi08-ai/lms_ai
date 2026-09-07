@@ -1,0 +1,155 @@
+import mongoose from 'mongoose';
+
+export const CATEGORIES = [
+  'Computer Science',
+  'Data Science',
+  'Artificial Intelligence',
+  'Business',
+  'Literature',
+  'History',
+  'Physics',
+  'Mystery',
+  'Romance',
+  'Fantasy',
+  'Science Fiction',
+  'Thriller',
+  'Biography',
+  'Self-Help',
+  'Philosophy',
+];
+
+export const GENRES = [
+  'Adventure',
+  'African-American Studies',
+  'Art',
+  'Banned Books',
+  'Biography',
+  'Business',
+  'Canadian Literature',
+  'Classic',
+  'Computers',
+  'Cooking',
+  'Correspondence',
+  'Creative Commons',
+  'Criticism',
+  'Drama',
+  'Espionage',
+  'Essays',
+  'Etiquette',
+  'Fantasy',
+  'Fiction and Literature',
+  'Games',
+  'Gay/Lesbian',
+  'Ghost Stories',
+  'Gothic',
+  'Government Publication',
+  'Harvard Classics',
+  'Health',
+  'History',
+  'Horror',
+  'Humor',
+  'Instructional',
+  'Language',
+  'Music',
+  'Mystery/Detective',
+  'Myth',
+  'Nature',
+  'Nautical',
+  'Non-fiction',
+  'Occult',
+  'Periodical',
+  'Philosophy',
+  'Pirate Tales',
+  'Poetry',
+  'Politics',
+  'Post-1930',
+  'Psychology',
+  'Pulp',
+  'Random Selection',
+  'Reference',
+  'Religion',
+  'Romance',
+  'Satire',
+  'Science',
+  'Science Fiction',
+  'Sexuality',
+  'Short Story',
+  'Short Story Collection',
+  'Thriller',
+  'Travel',
+  'War',
+  'Western',
+  "Women's Studies",
+  'Young Readers',
+  'Computer Science',
+  'Data Science',
+  'Artificial Intelligence',
+  'Physics',
+  'Self-Help',
+  'Literature',
+  'Fiction',
+  'Mystery',
+  'Young Adult',
+];
+
+const bookSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    subtitle: { type: String, trim: true, default: '' },
+    isbn: { type: String, required: true, unique: true, trim: true },
+    isbn10: { type: String, trim: true, default: '' },
+    summary: { type: String, default: '' },
+    authors: { type: [String], default: [] },
+    publisher: { type: String, default: '' },
+    publicationYear: { type: Number, min: 1400, max: 2100 },
+    releaseDate: { type: Date },
+    isUpcoming: { type: Boolean, default: false, index: true },
+    featured: { type: Boolean, default: false, index: true },
+    category: { type: String, required: true, index: true },
+    genres: { type: [String], default: [], index: true },
+    subcategory: { type: String, default: '', index: true },
+    shelfLocation: { type: String, default: '' },
+    tags: { type: [String], default: [] },
+    coverImage: { type: String, default: '' },
+    totalCopies: { type: Number, default: 0, min: 0 },
+    availableCopies: { type: Number, default: 0, min: 0 },
+    language: { type: String, default: 'English' },
+    pages: { type: Number, default: 0 },
+    isFree: { type: Boolean, default: false, index: true },
+    averageRating: { type: Number, default: 0, min: 0, max: 5 },
+    reviewCount: { type: Number, default: 0, min: 0 },
+    downloadCount: { type: Number, default: 0, min: 0 },
+    gutenbergId: { type: Number, unique: true, sparse: true, index: true },
+    catalogId: { type: String, unique: true, sparse: true, index: true, trim: true },
+    barcode: { type: String, unique: true, sparse: true, index: true, trim: true },
+    pdfFileName: { type: String, default: '' },
+    fullText: { type: String, default: '' },
+    source: { type: String, default: 'library' },
+    sourceUrl: { type: String, default: '' },
+    textUrl: { type: String, default: '' },
+    htmlUrl: { type: String, default: '' },
+  },
+  { timestamps: true },
+);
+
+bookSchema.index({ title: 'text', authors: 'text', tags: 'text', summary: 'text', isbn: 'text' });
+bookSchema.index({ category: 1, subcategory: 1 });
+bookSchema.index({ availableCopies: 1 });
+bookSchema.index({ releaseDate: 1, isUpcoming: 1 });
+bookSchema.index({ isFree: 1, category: 1, title: 1 });
+bookSchema.index({ authors: 1 });
+bookSchema.index({ catalogId: 1, barcode: 1 });
+
+bookSchema.pre('save', async function assignIds() {
+  if (this.catalogId && this.barcode) return;
+  const { assignCatalogId } = await import('../services/bookCodeService.js');
+  await assignCatalogId(this);
+});
+
+bookSchema.virtual('copies', {
+  ref: 'BookCopy',
+  localField: '_id',
+  foreignField: 'bookId',
+});
+
+export const Book = mongoose.model('Book', bookSchema);

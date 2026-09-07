@@ -1,0 +1,24 @@
+import { Router } from 'express';
+import * as ai from '../controllers/aiController.js';
+import { protect, adminOnly } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimit.js';
+
+const r = Router();
+r.use(protect, aiLimiter);
+r.get('/status', ai.aiStatus);
+r.post('/chat', ai.chat);
+r.post('/elena', ai.chat);
+r.post('/elena/stream', ai.streamElena);
+r.get('/conversations', ai.listConversations);
+r.get('/conversations/:id', ai.getConversation);
+r.delete('/conversations/:id', ai.deleteConversation);
+r.post('/conversations/:id/clear', ai.clearConversation);
+r.post('/conversations/:id/messages', ai.postConversationMessage);
+r.post('/conversations/:id/feedback', ai.rateMessage);
+r.post('/recommend', ai.recommend);
+r.get('/insights/:bookId', ai.insights);
+r.post('/ocr', adminOnly, ai.ocr);
+r.post('/nl-query', adminOnly, ai.analyticsQuery);
+r.get('/report', adminOnly, ai.report);
+r.post('/tts', ai.speakTts);
+export default r;
