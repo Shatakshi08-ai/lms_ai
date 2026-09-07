@@ -17,7 +17,11 @@ export function errorHandler(err, req, res, _next) {
     message = err.message;
   } else if (err.code === 11000) {
     status = 409;
-    message = 'Duplicate value';
+    const key = Object.keys(err.keyPattern || {})[0] || '';
+    if (key === 'isbn') message = 'A book with this ISBN already exists.';
+    else if (key === 'barcode') message = 'A book with this barcode already exists.';
+    else if (key === 'catalogId') message = 'A book with this catalog ID already exists.';
+    else message = 'A book with this barcode already exists.';
   }
   if (!err.isOperational && status >= 500) logger.error(err);
   else logger.warn({ message, path: req.path, status });

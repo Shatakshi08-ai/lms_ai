@@ -200,6 +200,12 @@ export const createBook = asyncHandler(async (req, res) => {
   delete payload.barcode;
   delete payload.pdfFileName;
   if (!payload.genres?.length && payload.category) payload.genres = [payload.category];
+  if (payload.isbn) {
+    const existingIsbn = await Book.findOne({ isbn: String(payload.isbn).trim() }).select('_id title isbn');
+    if (existingIsbn) {
+      throw new AppError('A book with this ISBN already exists.', 409);
+    }
+  }
   const book = await Book.create(payload);
   const copies = Number(req.body.initialCopies || 1);
   let seq = await nextBarcodeSeq();
@@ -363,4 +369,24 @@ export const uploadBookPdf = asyncHandler(async (req, res) => {
     req,
   });
   res.json({ success: true, book: { ...book.toObject(), fullText: undefined }, pdfStatus: 'Uploaded' });
+});
+
+export const uploadBookCover = asyncHandler(async (req, res) => {
+  const book = await Book.findById(req.params.id);
+  if (!book) throw new AppError('Book not found', 404);
+  if (!req.file?.filename) throw new AppError('Please upload a cover image.', 400);
+  book.coverImage = `/uploads/covers/${req.file.filename}`;
+  await book.save();
+  await writeAudit({
+    actorId: req.user._id,
+    action: 'BOOK_UPDATE',
+    entity: 'Book',
+    entityId: book._id,
+    bookId: book._id,
+    bookTitle: book.title,
+    catalogId: book.catalogId,
+    changes: { coverImage: book.coverImage },
+    req,
+  });
+  res.json({ success: true, book: { ...book.toObject(), fullText: undefined }, coverImage: book.coverImage });
 });

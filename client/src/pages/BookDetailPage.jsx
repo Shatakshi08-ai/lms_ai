@@ -9,6 +9,7 @@ import { isPatron } from '../utils/roles.js';
 import BarcodeModal from '../components/BarcodeModal.jsx';
 import { downloadBookPdf, readErrorMessage } from '../services/downloadPdf.js';
 import BookCard from '../components/BookCard.jsx';
+import AuthPrompt from '../components/AuthPrompt.jsx';
 
 const FALLBACK_COVER = 'https://www.gutenberg.org/pics/logo-144x144.png';
 
@@ -167,7 +168,7 @@ export default function BookDetailPage() {
         {progress && <p className="mt-2 text-sm">Reading progress: {progress.percent}% (page {progress.page})</p>}
         <Space direction="vertical" className="mt-4 w-full">
           <Button type="primary" block onClick={() => nav(`/catalog/${id}/read`)}>
-            {book.isFree ? (progress?.page > 1 ? 'Continue reading' : 'Read Now') : 'Open Book'}
+            {progress?.page > 1 ? 'Continue reading' : 'Read Book'}
           </Button>
           {user && (data?.canDownloadPdf || book.gutenbergId || book.isFree || book.pdfFileName) && (
             <Button
@@ -176,7 +177,7 @@ export default function BookDetailPage() {
               onClick={async () => {
                 setPdfBusy(true);
                 try {
-                  await downloadBookPdf(id, book.catalogId || book.title);
+                  await downloadBookPdf(id, book.title || book.catalogId);
                   message.success('Download started.');
                 } catch (e) {
                   message.error(await readErrorMessage(e, 'PDF download is not available for this title.'));

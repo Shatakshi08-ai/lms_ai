@@ -175,9 +175,13 @@ export async function resolveBookPdf(book) {
     return buildPdfFromPages(book.title, pages.length ? pages : [book.fullText]);
   }
 
-  if (book.isFree) {
-    const pages = await loadReadablePages(book);
-    if (pages?.length) return buildPdfFromPages(book.title, pages);
+  if (book.isFree || book.gutenbergId || book.fullText) {
+    try {
+      const pages = await loadReadablePages(book);
+      if (pages?.length) return buildPdfFromPages(book.title, pages);
+    } catch {
+      /* fall through */
+    }
   }
 
   return null;

@@ -65,7 +65,17 @@ export default function CartPage() {
         </p>
       )}
       {!isLoading && !items.length && (
-        <Empty description="Your cart is empty. Explore books and add your favorites to your cart." />
+        <Empty
+          description={
+            <span>
+              Your cart is empty.
+              <br />
+              Add books to your cart to see them here.
+              <br />
+              <Link to="/catalog">Browse books</Link>
+            </span>
+          }
+        />
       )}
       <div className="ql-cart-grid">
         {items.map((b) => (

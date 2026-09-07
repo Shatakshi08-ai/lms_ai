@@ -303,47 +303,87 @@ export const readBook = asyncHandler(async (req, res) => {
   if (!(await canReadBook(req.user, book._id))) {
     return res.status(403).json({ success: false, code: 'LOGIN_REQUIRED', message: LOGIN_REQUIRED_MESSAGE });
   }
-  if (!book.isFree && !book.fullText) {
-    if (req.user) {
-      await writeAudit({
-        actorId: req.user._id,
-        action: 'BOOK_READ',
-        entity: 'Book',
-        entityId: book._id,
-        bookId: book._id,
-        bookTitle: book.title,
-        req,
-      });
-    }
+  if (req.user) {
+    await writeAudit({
+      actorId: req.user._id,
+      action: 'BOOK_READ',
+      entity: 'Book',
+      entityId: book._id,
+      bookId: book._id,
+      bookTitle: book.title,
+      req,
+    });
+  }
+
+  // Uploaded PDF-only titles are read in the client PDF viewer.
+  if (book.pdfFileName && !book.fullText && !book.gutenbergId && !book.isFree) {
+    return res.json({
+      success: true,
+      readable: true,
+      mode: 'pdf',
+      title: book.title,
+      authors: book.authors,
+      category: book.category,
+      coverImage: book.coverImage,
+      hasPdf: true,
+    });
+  }
+
+  if (!book.isFree && !book.fullText && !book.gutenbergId) {
     return res.json({
       success: true,
       readable: false,
-      message: 'Full text is not stored here. Borrow a library copy or open a free public-domain edition if one is listed.',
+      message: 'Full text is not stored here. Borrow a library copy or ask a librarian to upload a PDF for this title.',
     });
   }
   try {
     const pages = await loadReadablePages(book);
-    const page = Math.min(pages.length, Math.max(1, Number(req.query.page || 1)));
-    if (req.user) {
-      await writeAudit({
-        actorId: req.user._id,
-        action: 'BOOK_READ',
-        entity: 'Book',
-        entityId: book._id,
-        bookId: book._id,
-        bookTitle: book.title,
-        req,
+    if (!pages?.length) {
+      if (book.pdfFileName) {
+        return res.json({
+          success: true,
+          readable: true,
+          mode: 'pdf',
+          title: book.title,
+          authors: book.authors,
+          category: book.category,
+          coverImage: book.coverImage,
+          hasPdf: true,
+        });
+      }
+      return res.json({
+        success: true,
+        readable: false,
+        message: 'Could not load reading content for this title right now.',
       });
     }
+    const page = Math.min(pages.length, Math.max(1, Number(req.query.page || 1)));
     res.json({
       success: true,
       readable: true,
+      mode: 'text',
       page,
       totalPages: pages.length,
       content: pages[page - 1],
       title: book.title,
+      authors: book.authors,
+      category: book.category,
+      coverImage: book.coverImage,
+      hasPdf: Boolean(book.pdfFileName || book.gutenbergId || book.isFree || book.fullText),
     });
   } catch {
+    if (book.pdfFileName) {
+      return res.json({
+        success: true,
+        readable: true,
+        mode: 'pdf',
+        title: book.title,
+        authors: book.authors,
+        category: book.category,
+        coverImage: book.coverImage,
+        hasPdf: true,
+      });
+    }
     throw new AppError('Could not load reading content right now. Try again shortly.', 502);
   }
 });

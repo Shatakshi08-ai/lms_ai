@@ -1,22 +1,40 @@
-import { Card, Tag, Button, Rate } from 'antd';
+import { Tag, Button, Rate, Tooltip } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, BookOpen } from 'lucide-react';
 import { bookGenres } from '../data/library.js';
 
 const FALLBACK_COVER = 'https://www.gutenberg.org/pics/logo-144x144.png';
 
-export default function BookCard({ book, extra, coverClass = 'h-44', wishlisted, onWishlist, wishBusy, inCart, onCart, cartBusy, locked, onLocked }) {
+export default function BookCard({
+  book,
+  extra,
+  coverClass = 'h-56',
+  wishlisted,
+  onWishlist,
+  wishBusy,
+  inCart,
+  onCart,
+  cartBusy,
+  locked,
+  onLocked,
+}) {
   const nav = useNavigate();
   const genres = bookGenres(book).slice(0, 2);
   const cover = book.coverImage || FALLBACK_COVER;
   const isLocked = Boolean(locked || book.locked);
+  const category = book.category || genres[0];
+  const authors = (book.authors || []).join(', ') || 'Unknown author';
+  const readerPath = `/catalog/${book._id}/read`;
+  const detailsPath = `/catalog/${book._id}`;
 
-  function open() {
+  function openReader(e) {
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
     if (isLocked) {
       onLocked?.(book);
       return;
     }
-    nav(book.isFree ? `/catalog/${book._id}/read` : `/catalog/${book._id}`);
+    nav(readerPath);
   }
 
   function openDetails(e) {
@@ -27,93 +45,122 @@ export default function BookCard({ book, extra, coverClass = 'h-44', wishlisted,
   }
 
   return (
-    <Card
-      hoverable={false}
-      className="book-card h-full overflow-hidden"
-      cover={
-        <Link to={isLocked ? '#' : `/catalog/${book._id}`} onClick={openDetails} className={`book-card-cover ${coverClass} block`} aria-label={`Open ${book.title}`}>
-          <img
-            alt={book.title || 'Book cover'}
-            src={cover}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              e.currentTarget.src = FALLBACK_COVER;
-            }}
-          />
+    <article className="book-hero-card h-full">
+      <Link
+        to={isLocked ? '#' : readerPath}
+        onClick={(e) => {
+          if (isLocked) {
+            openDetails(e);
+            return;
+          }
+          e.preventDefault();
+          openReader(e);
+        }}
+        className={`book-hero-cover ${coverClass}`}
+        aria-label={`Read ${book.title}`}
+      >
+        <img
+          alt={book.title || 'Book cover'}
+          src={cover}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.src = FALLBACK_COVER;
+          }}
+        />
+        <div className="book-hero-cover-shade" aria-hidden />
+        <div className="book-hero-cover-meta">
+          {book.isFree ? <span className="book-hero-pill free">FREE</span> : <span className="book-hero-pill">Library</span>}
+          {category && <span className="book-hero-pill muted">{category}</span>}
+        </div>
+      </Link>
+
+      <div className="book-hero-body">
+        <Link
+          to={isLocked ? '#' : readerPath}
+          onClick={(e) => {
+            if (isLocked) {
+              openDetails(e);
+              return;
+            }
+            e.preventDefault();
+            openReader(e);
+          }}
+          className="book-hero-title"
+        >
+          {book.title}
         </Link>
-      }
-    >
-      <Card.Meta
-        title={
-          <Link to={isLocked ? '#' : `/catalog/${book._id}`} onClick={openDetails} className="line-clamp-2 text-[color:var(--text-color)]">
-            {book.title}
-          </Link>
-        }
-        description={
-          <div>
-            <div className="truncate text-[color:var(--muted-text)]">{(book.authors || []).join(', ')}</div>
-            {book.catalogId && <div className="truncate text-xs text-[color:var(--muted-text)]">{book.catalogId}</div>}
-            {book.summary && <p className="mt-1 line-clamp-2 text-xs text-[color:var(--muted-text)]">{book.summary}</p>}
-            <div className="mt-2 flex flex-wrap items-center gap-1">
-              {book.isFree ? <Tag color="green">FREE</Tag> : <Tag>Library</Tag>}
-              {genres.map((g) => (
-                <Tag key={g} className="genre-tag m-0">
-                  {g}
-                </Tag>
-              ))}
-            </div>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <span className="flex items-center gap-1 text-xs">
-                <Rate disabled allowHalf value={book.averageRating || 0} style={{ fontSize: 12 }} />
-                <span className="text-[color:var(--muted-text)]">({book.reviewCount || 0})</span>
-              </span>
-              {book.availableCopies != null && (
-                <Tag color={book.availableCopies > 0 ? 'success' : 'error'}>{book.availableCopies} avail</Tag>
-              )}
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button
-                type="primary"
-                size="small"
-                onClick={open}
-              >
-                {isLocked ? 'Read / Open' : book.isFree ? 'Read Now' : 'Open Book'}
-              </Button>
-              {onWishlist && (
-                <Button
-                  size="small"
-                  aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-                  className={wishlisted ? 'wishlist-btn wishlist-btn-on' : 'wishlist-btn'}
-                  icon={<Heart size={14} fill={wishlisted ? 'currentColor' : 'none'} />}
-                  loading={wishBusy}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onWishlist(book, !wishlisted);
-                  }}
-                >
-                  {wishlisted ? 'Saved' : 'Wishlist'}
-                </Button>
-              )}
-              {onCart && (
-                <Button
-                  size="small"
-                  aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
-                  icon={<ShoppingCart size={14} />}
-                  loading={cartBusy}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onCart(book, !inCart);
-                  }}
-                >
-                  {inCart ? 'In cart' : 'Add to Cart'}
-                </Button>
-              )}
-            </div>
-            {extra}
+        <p className="book-hero-author">{authors}</p>
+        {book.summary && <p className="book-hero-summary">{book.summary}</p>}
+
+        <div className="book-hero-meta">
+          <span className="book-hero-rating">
+            <Rate disabled allowHalf value={book.averageRating || 0} style={{ fontSize: 12 }} />
+            <span>({book.reviewCount || 0})</span>
+          </span>
+          {book.availableCopies != null && (
+            <Tag color={book.availableCopies > 0 ? 'success' : 'error'} className="m-0">
+              {book.availableCopies} avail
+            </Tag>
+          )}
+        </div>
+
+        {genres.length > 0 && (
+          <div className="book-hero-genres">
+            {genres.map((g) => (
+              <Tag key={g} className="genre-tag m-0">
+                {g}
+              </Tag>
+            ))}
           </div>
-        }
-      />
-    </Card>
+        )}
+
+        <div className="book-hero-actions">
+          <Button type="primary" size="middle" icon={<BookOpen size={14} />} onClick={openReader} className="book-hero-primary">
+            Read Book
+          </Button>
+          <Button size="middle" onClick={() => (isLocked ? onLocked?.(book) : nav(detailsPath))}>
+            Details
+          </Button>
+          {onWishlist && (
+            <Tooltip title={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}>
+              <Button
+                size="middle"
+                aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                className={wishlisted ? 'wishlist-btn wishlist-btn-on' : 'wishlist-btn'}
+                icon={<Heart size={14} fill={wishlisted ? 'currentColor' : 'none'} />}
+                loading={wishBusy}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onWishlist(book, !wishlisted);
+                }}
+              >
+                {wishlisted ? 'Saved' : 'Wishlist'}
+              </Button>
+            </Tooltip>
+          )}
+          {onCart && (
+            <Tooltip title={inCart ? 'Remove from cart' : 'Add to cart'}>
+              <Button
+                size="middle"
+                aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
+                className={inCart ? 'cart-btn cart-btn-on' : 'cart-btn'}
+                icon={<ShoppingCart size={14} />}
+                loading={cartBusy}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onCart(book, !inCart);
+                }}
+              >
+                {inCart ? 'In cart' : 'Add to Cart'}
+              </Button>
+            </Tooltip>
+          )}
+        </div>
+        {extra}
+      </div>
+    </article>
   );
 }

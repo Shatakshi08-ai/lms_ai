@@ -50,6 +50,7 @@ export default function CatalogPage() {
   const toggle = useMutation({
     mutationFn: async ({ book, on }) => {
       if (!user) {
+        message.info('Please log in to add books to your wishlist.');
         nav('/login');
         throw new Error('auth');
       }
@@ -60,7 +61,8 @@ export default function CatalogPage() {
       qc.invalidateQueries({ queryKey: ['wishlist-ids'] });
       qc.invalidateQueries({ queryKey: ['wishlist'] });
       qc.invalidateQueries({ queryKey: ['notifications'] });
-      message.success(vars.on ? 'Book added to your wishlist. ❤️' : 'Removed from wishlist');
+      qc.invalidateQueries({ queryKey: ['patron-home'] });
+      message.success(vars.on ? 'Book added to your wishlist.' : 'Removed from wishlist');
     },
     onError: (e) => {
       if (e.message !== 'auth') message.error(e.response?.data?.message || 'Wishlist update failed');
@@ -74,6 +76,7 @@ export default function CatalogPage() {
   const cartMut = useMutation({
     mutationFn: async ({ book, on }) => {
       if (!user) {
+        message.info('Please log in to add books to your cart.');
         nav('/login');
         throw new Error('auth');
       }
@@ -84,8 +87,9 @@ export default function CatalogPage() {
       qc.invalidateQueries({ queryKey: ['cart-ids'] });
       qc.invalidateQueries({ queryKey: ['cart'] });
       qc.invalidateQueries({ queryKey: ['notifications'] });
+      qc.invalidateQueries({ queryKey: ['patron-home'] });
       if (vars.on && data?.alreadyInCart) message.info(data.message || 'This book is already in your cart.');
-      else if (vars.on) message.success(data?.message || 'Book added to your cart successfully. 🛒');
+      else if (vars.on) message.success(data?.message || 'Book added to your cart.');
       else message.success('Removed from cart.');
     },
     onError: (e) => {

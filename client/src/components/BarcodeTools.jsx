@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Button, Card, Descriptions, Space, Table, Tag, Typography, Upload, message } from 'antd';
+import { Alert, Button, Card, Descriptions, Input, Space, Table, Tag, Typography, Upload, message } from 'antd';
+import { Link } from 'react-router-dom';
 import Barcode from 'react-barcode';
 import api from '../services/api.js';
 
@@ -32,10 +33,12 @@ async function decodeWithHtml5(file) {
   }
 }
 
-export default function BarcodeTools({ onFound }) {
+export default function BarcodeTools({ onFound, onNotFound, onEdit }) {
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [manual, setManual] = useState('');
   const [result, setResult] = useState(null);
+  const [missingCode, setMissingCode] = useState('');
   const [printOpen, setPrintOpen] = useState(false);
   const camRef = useRef(null);
   const html5Ref = useRef(null);
@@ -55,6 +58,7 @@ export default function BarcodeTools({ onFound }) {
       return;
     }
     setBusy(true);
+    setMissingCode('');
     try {
       const { data } = await api.get(`/books/lookup/${encodeURIComponent(value)}`, { params: { source } });
       setResult(data);
@@ -62,7 +66,9 @@ export default function BarcodeTools({ onFound }) {
       message.success(`Found ${data.book?.title || value}`);
     } catch (e) {
       setResult(null);
-      message.error(e.response?.data?.message || 'No book matched this barcode.');
+      setMissingCode(value);
+      onNotFound?.(value);
+      message.warning(e.response?.data?.message || 'Book not found for this barcode.');
     } finally {
       setBusy(false);
     }
@@ -140,20 +146,66 @@ export default function BarcodeTools({ onFound }) {
         <Upload accept="image/*" showUploadList={false} beforeUpload={onUpload}>
           <Button loading={busy}>Upload barcode</Button>
         </Upload>
+        <Input.Search
+          className="w-64"
+          placeholder="Type barcode / ISBN / Book ID"
+          value={manual}
+          onChange={(e) => setManual(e.target.value)}
+          onSearch={(v) => lookup(v, 'scan')}
+          enterButton="Lookup"
+          loading={busy}
+        />
       </Space>
       {scanning && <div id="ql-barcode-camera" ref={camRef} className="max-w-md overflow-hidden rounded-md" />}
+
+      {missingCode && (
+        <Alert
+          type="warning"
+          showIcon
+          message="Book Not Found"
+          description={`No book matched “${missingCode}”. You can add it as a new title.`}
+          action={
+            <Button
+              type="primary"
+              onClick={() => {
+                onNotFound?.(missingCode);
+                message.info('Add Book form prefilled with the scanned code.');
+              }}
+            >
+              Add New Book
+            </Button>
+          }
+        />
+      )}
+
       {book && (
         <Card
-          title={book.title}
+          title={
+            <div className="flex flex-wrap items-center gap-3">
+              {book.coverImage ? (
+                <img src={book.coverImage} alt="" className="h-14 w-10 rounded object-cover" />
+              ) : null}
+              <span>{book.title}</span>
+              <Tag color="green">Book Found</Tag>
+            </div>
+          }
           extra={
-            printValue ? (
-              <Button onClick={() => setPrintOpen(true)}>View / Print barcode</Button>
-            ) : null
+            <Space wrap>
+              {onEdit && (
+                <Button type="primary" onClick={() => onEdit(book, result)}>
+                  Update book
+                </Button>
+              )}
+              <Link to={`/catalog/${book._id}`}>
+                <Button>Open details</Button>
+              </Link>
+              {printValue ? <Button onClick={() => setPrintOpen(true)}>View / Print barcode</Button> : null}
+            </Space>
           }
         >
           <Descriptions size="small" bordered column={{ xs: 1, md: 2 }}>
             <Descriptions.Item label="Book ID">{book.catalogId || '—'}</Descriptions.Item>
-            <Descriptions.Item label="Barcode">{book.barcode || '—'}</Descriptions.Item>
+            <Descriptions.Item label="Barcode">{book.barcode || result?.copy?.barcode || '—'}</Descriptions.Item>
             <Descriptions.Item label="Author">{(book.authors || []).join(', ') || '—'}</Descriptions.Item>
             <Descriptions.Item label="Category">{book.category || '—'}</Descriptions.Item>
             <Descriptions.Item label="ISBN">{book.isbn || '—'}</Descriptions.Item>

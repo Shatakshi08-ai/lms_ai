@@ -41,7 +41,7 @@ function paginate(text) {
 }
 
 export async function loadReadablePages(book) {
-  if (!book?.isFree && !book?.fullText) return null;
+  if (!book?.isFree && !book?.fullText && !book?.gutenbergId) return null;
   const key = String(book._id);
   if (textCache.has(key)) return textCache.get(key);
   if (book.fullText) {

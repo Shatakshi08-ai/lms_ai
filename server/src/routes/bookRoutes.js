@@ -3,6 +3,7 @@ import * as books from '../controllers/bookController.js';
 import * as extras from '../controllers/catalogExtrasController.js';
 import { protect, staffOnly, optionalProtect } from '../middleware/auth.js';
 import { pdfUpload } from '../middleware/uploadPdf.js';
+import { coverUpload } from '../middleware/uploadCover.js';
 
 const r = Router();
 r.get('/', optionalProtect, books.listBooks);
@@ -32,6 +33,7 @@ r.put('/:id/progress', protect, extras.saveProgress);
 r.get('/:id/read', optionalProtect, extras.readBook);
 r.get('/:id/pdf', protect, extras.downloadPdf);
 r.post('/:id/pdf', protect, staffOnly, pdfUpload.single('pdf'), books.uploadBookPdf);
+r.post('/:id/cover', protect, staffOnly, coverUpload.single('cover'), books.uploadBookCover);
 r.get('/:id', optionalProtect, books.getBook);
 r.post('/', protect, staffOnly, books.createBook);
 r.patch('/:id', protect, staffOnly, books.updateBook);
